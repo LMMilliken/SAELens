@@ -420,7 +420,7 @@ def get_sparsity_and_variance_metrics(
         else:
             mask = torch.ones_like(batch_tokens, dtype=torch.bool)
         flattened_mask = mask.flatten()
-
+        mask = mask.to(sae.device)
         # get cache
         _, cache = model.run_with_cache(
             batch_tokens,
@@ -566,13 +566,13 @@ def get_recons_loss(
     if len(ignore_tokens) > 0:
         mask = torch.logical_not(
             torch.any(
-                torch.stack([batch_tokens == token for token in ignore_tokens], dim=0),
+                torch.stack([batch_tokens == token for token in ignore_tokens], dim=0).to(sae.device),
                 dim=0,
             )
         )
     else:
-        mask = torch.ones_like(batch_tokens, dtype=torch.bool)
-
+        mask = torch.ones_like(batch_tokens, dtype=torch.bool).to(sae.device)
+        
     metrics = {}
 
     # TODO(tomMcGrath): the rescaling below is a bit of a hack and could probably be tidied up
